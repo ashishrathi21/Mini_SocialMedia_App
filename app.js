@@ -25,9 +25,9 @@ app.get('/login', (req, res) => {
 })
 
 app.get('/post', isLoggedIn, async (req, res) => {
-   
+  let user = await userModel.findOne({ email: req.user.email });
     let posts = await postModel.find().populate('user');
-   res.render('post', {posts});
+   res.render('post', {posts, user});
 })
 
 app.get('/account', isLoggedIn, async (req, res) => {
@@ -45,9 +45,40 @@ app.get('/logout', (req, res) => {
     res.redirect('/login');
 })
 
+app.get('/post/:id', isLoggedIn, async (req, res) => {
+    let posts = await postModel.find({ user: req.params.id }).populate('user');
+    res.render("postDetail", { posts });
+});
+
+app.get('/like/:id', isLoggedIn, async (req, res) => {
+  
+  let post = await postModel.findById(req.params.id);
+  if (!post) return res.status(404).send("Post not found");
+
+  let user = await userModel.findOne({ email: req.user.email });
+
+  let index = post.postLikes.indexOf(user._id);
+
+  if (index === -1) {
+      post.postLikes.push(user._id);   // LIKE
+  } else {
+      post.postLikes.splice(index, 1); // UNLIKE
+  }
+
+  await post.save();
+
+  res.redirect('/post');
+});
+
+
 
 app.post('/register', async (req, res) => {
    let { name, username, password, email } = req.body;
+
+   if (!name ||!username || !email || !password) {
+        return res.redirect("/"); 
+    }
+
 
    let existingUser = await userModel.findOne({email});
    if(existingUser) return res.status(400).send('User already exists')
@@ -71,6 +102,10 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
    let { password, email } = req.body;
    
+     if (!email || !password) {
+        return res.redirect("/login"); 
+    }
+
     let existingUser = await userModel.findOne({email});
    if(!existingUser) return res.status(400).send('User does not exist')
    bcrypt.compare(password, existingUser.password, (err, result)=> {
@@ -105,15 +140,23 @@ app.post('/post/create', isLoggedIn, async (req, res) => {
 
 
 function isLoggedIn(req, res, next) {
-    if(!req.cookies.token) return res.status(400).send('You must be logged in')
-    else {
-        let data = jwt.verify(req.cookies.token, 'secretkey123')
-        req.user = data
-        
-    }   
-    next();
+    let token = req.cookies.token;
+
+    if (!token) {
+        return res.redirect("/login");
+    }
+
+    try {
+        let data = jwt.verify(token, "secretkey123");
+        req.user = data;
+        next();
+    } catch (err) {
+        // Invalid token (tampered/expired)
+        res.clearCookie("token");
+        return res.redirect("/login");
+    }
 }
 
 
 
-module.exports = app;
+app.listen(3000)

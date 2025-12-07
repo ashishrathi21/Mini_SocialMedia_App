@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Posts</title>
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
     <style>
@@ -18,9 +18,7 @@
     </style>
   </head>
 
-  <!-- BODY SCROLL STOP -->
   <body class="bg-black overflow-hidden">
-    <!-- APP HEIGHT FIXED -->
     <div
       class="h-screen max-w-sm w-full mx-auto bg-zinc-900 text-white rounded-lg shadow-lg flex flex-col"
     >
@@ -29,75 +27,96 @@
         <div class="text-xl md:text-2xl font-bold">Mini Social Media App</div>
       </header>
 
-      <!-- POSTS AREA (ONLY THIS SCROLLS) -->
+      <!-- POSTS AREA -->
       <div class="flex-1 p-4 space-y-4 overflow-y-auto no-scrollbar">
-       <% posts.reverse().forEach(function(post){ %>
+
+        <% if (posts.length > 0) { %>
+
+          <% posts.reverse().forEach(function(post){ %>
+
             <div class="bg-zinc-800 rounded-xl p-4 space-y-4 shadow-md">
-          <div class="flex items-center space-x-3">
-            <img
-              src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
-              class="w-10 h-10 rounded-full object-cover"
-              alt=""
-            />
-            <div class="text-sm font-semibold">@<%= post.user.username %></div>
-          </div>
+              
+              <!-- USER INFO -->
+              <div class="flex items-center space-x-3">
+                <img
+                  src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
+                  class="w-10 h-10 rounded-full object-cover"
+                  alt=""
+                />
+                <div class="text-sm font-semibold">@<%= post.user.username %></div>
+              </div>
 
-          <!-- Content Text -->
-          <p class="text-zinc-300 text-xs leading-relaxed">
-           <pre class="whitespace-pre-wrap break-words text-zinc-300 text-xs leading-relaxed">
-  <%= post.postContent %>
-</pre>
+              <!-- TEXT CONTENT -->
+              <pre class="whitespace-pre-wrap break-words text-zinc-300 text-xs leading-relaxed">
+<%= post.postContent %>
+              </pre>
 
-          </p>
+              <!-- OPTIONAL IMAGE -->
+              <% if (post.postImage && post.postImage.trim() !== "") { %>
+                <div>
+                  <img 
+                    src="<%= post.postImage %>"
+                    class="w-full h-40 object-cover rounded-lg"
+                    alt=""
+                  />
+                </div>
+              <% } %>
 
-          <!-- Post Image (reduced height) -->
-          <% if (post.postImage && post.postImage.trim() !== "") { %>
-  <div>
-    <img 
-      src="<%= post.postImage %>" 
-      class="w-full h-40 object-cover rounded-lg" 
-      alt=""
-    />
-  </div>
-<% } %>
+              <!-- LIKE + COMMENT -->
+              <div class="flex items-center justify-between pt-1 text-lg">
+                <div class="flex space-x-4">
+
+                  <!-- LIKE BUTTON -->
+                  <a href="/like/<%= post._id %>">
+                    <p class="text-zinc-300">
+  <%= post.postLikes.length %>
+
+  <% let liked = post.postLikes.map(id => id.toString()).includes(user._id.toString()); %>
+
+  <% if (!liked) { %>
+    <i class="fa-regular fa-thumbs-up"></i>
+  <% } else { %>
+    <i class="fa-solid fa-thumbs-up"></i>
+  <% } %>
+</p>
 
 
-          <!-- Buttons Section -->
-          <div class="flex items-center justify-between pt-1 text-lg">
-            <!-- Left icons -->
-            <div class="flex space-x-4">
-              <i class="fa-regular fa-thumbs-up"></i>
-              <i class="fa-regular fa-comment"></i>
-              <i class="fa-solid fa-share"></i>
+                  </a>
+
+                  <p>0 <i class="fa-regular fa-comment"></i></p>
+
+                </div>
+
+                <button class="text-xl">⋯</button>
+              </div>
+
             </div>
 
-            <!-- Right (3 dots) -->
-            <button class="text-xl">⋯</button>
-          </div>
-        </div>
+          <% }) %>
 
-       <% })%>
+        <% } else { %>
+
+          <p class="text-center text-zinc-300">No posts available</p>
+
+        <% } %>
+
       </div>
 
-      <!-- BOTTOM NAV -->
+      <!-- NAV -->
       <nav class="p-4 rounded-b-lg">
         <ul class="flex justify-around text-lg">
           <a href="/post">
-            <li
-            class="cursor-pointer text-blue-300 bg-zinc-800 px-8 py-2 rounded-lg"
-          >
-            Posts
-          </li>
+            <li class="cursor-pointer text-blue-300 bg-zinc-800 px-8 py-2 rounded-lg">Posts</li>
           </a>
           <a href="/account">
-            <li
-            class="cursor-pointer text-zinc-300 bg-zinc-800 px-8 py-2 rounded-lg"
-          >
-            Account
-          </li>
+            <li class="cursor-pointer text-zinc-300 bg-zinc-800 px-8 py-2 rounded-lg">Account</li>
           </a>
         </ul>
       </nav>
+
     </div>
+
+
+    
   </body>
 </html>
