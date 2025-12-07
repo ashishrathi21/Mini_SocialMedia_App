@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style>
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <!-- BODY SCROLL STOP -->
+  <body class="bg-black overflow-hidden">
+    <!-- APP HEIGHT FIXED -->
+    <div
+      class="h-screen max-w-sm w-full mx-auto bg-zinc-900 text-white rounded-lg shadow-lg flex flex-col"
+    >
+      <!-- HEADER -->
+      <header class="p-4 text-center flex justify-center">
+        <div class="text-xl md:text-2xl font-bold">Mini Social Media App</div>
+      </header>
+
+      <!-- POSTS AREA (ONLY THIS SCROLLS) -->
+      <div class="flex-1 p-4 space-y-4 overflow-y-auto no-scrollbar">
+       <% posts.reverse().forEach(function(post){ %>
+            <div class="bg-zinc-800 rounded-xl p-4 space-y-4 shadow-md">
+          <div class="flex items-center space-x-3">
+            <img
+              src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
+              class="w-10 h-10 rounded-full object-cover"
+              alt=""
+            />
+            <div class="text-sm font-semibold">@<%= post.user.username %></div>
+          </div>
+
+          <!-- Content Text -->
+          <p class="text-zinc-300 text-xs leading-relaxed">
+           <pre class="whitespace-pre-wrap break-words text-zinc-300 text-xs leading-relaxed">
+  <%= post.postContent %>
+</pre>
+
+          </p>
+
+          <!-- Post Image (reduced height) -->
+          <% if (post.postImage && post.postImage.trim() !== "") { %>
+  <div>
+    <img 
+      src="<%= post.postImage %>" 
+      class="w-full h-40 object-cover rounded-lg" 
+      alt=""
+    />
+  </div>
+<% } %>
+
+
+          <!-- Buttons Section -->
+          <div class="flex items-center justify-between pt-1 text-lg">
+            <!-- Left icons -->
+            <div class="flex space-x-4">
+              <i class="fa-regular fa-thumbs-up"></i>
+              <i class="fa-regular fa-comment"></i>
+              <i class="fa-solid fa-share"></i>
+            </div>
+
+            <!-- Right (3 dots) -->
+            <button class="text-xl">⋯</button>
+          </div>
+        </div>
+
+       <% })%>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <nav class="p-4 rounded-b-lg">
+        <ul class="flex justify-around text-lg">
+          <a href="/post">
+            <li
+            class="cursor-pointer text-blue-300 bg-zinc-800 px-8 py-2 rounded-lg"
+          >
+            Posts
+          </li>
+          </a>
+          <a href="/account">
+            <li
+            class="cursor-pointer text-zinc-300 bg-zinc-800 px-8 py-2 rounded-lg"
+          >
+            Account
+          </li>
+          </a>
+        </ul>
+      </nav>
+    </div>
+  </body>
+</html>
